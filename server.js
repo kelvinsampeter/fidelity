@@ -13,6 +13,9 @@ if (!BOT_TOKEN || !CHAT_ID) {
   process.exit(1);
 }
 
+// Serve static files from 'public' directory
+app.use(express.static(path.join(process.cwd(), "public")));
+
 // Helper function to send message to Telegram
 async function sendTelegramMessage(message) {
   const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -81,4 +84,5 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
 

